@@ -59,3 +59,6 @@ PROBLEMI
 
 - come prevalorizzare le properties di un task?
 pass grafana: admin admin
+
+
+stream create --definition "http --port 20100 | log" --name httpingest
