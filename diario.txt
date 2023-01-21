@@ -1,0 +1,100 @@
+https://github.com/spring-tips/kafka-and-spring-batch/tree/master/src/main/java/com/example/bk
+
+
+creato progetto multimodulo
+fdp-batch
+common
+inviomail-main
+inviomail-worker
+ 
+poi mettici anche documentale
+
+
+1 step:
+fai poc: 
+- nel inviomailmain metti producer kafka, scrivi un personaleListMessageDto String name, Long id
+- nel invioworker metti consumer kafka , e scrive nello stdout
+- deploya tutto su data flow
+2 step :
+- migliora la logica: il main deve leggere da db la lista completa di fascicoli, crea n messaggi PersonalePartitionToElaborateDto (List<Long> idPersonales)
+- il worker legge ed elabora
+ 
+TODO come configuro la coda kafka?
+senza dataflow: tira su kafka broker e aggiungi configurazione..
+con dataflow: ?  
+
+Part V. Spring Cloud Stream Integration
+
+https://stackoverflow.com/questions/54905819/configure-spring-cloud-task-to-use-kafa-of-spring-cloud-data-flow-server
+
+https://docs.spring.io/spring-cloud-task/docs/2.1.0.RELEASE/reference/htmlsingle/#stream-integration-events
+
+deploya prima il inviomailmain che fa il publish
+
+
+TODO loop infinito:
+2023-01-20 13:27:47.762  INFO 28156 --- [| adminclient-8] org.apache.kafka.clients.NetworkClient   : [AdminClient clientId=adminclient-8] Node -1 disconnected.
+2023-01-20 13:27:47.763  WARN 28156 --- [| adminclient-8] org.apache.kafka.clients.NetworkClient   : [AdminClient clientId=adminclient-8] Connection to node -1 (localhost/127.0.0.1:9092) could not be established. Broker may not be available
+
+
+app register --name inviomailmain --type task  --uri maven://org.springframework.cloud.stream.app:log-sink:3.2.1  --metadata-uri maven://org.springframework.cloud.stream.app:log-sink:jar:metadata:3.2.1
+
+app register --name inviomailmain --type task  --uri maven://it.dmi.fascicolopersonale:inviomailmain:1.0-SNAPSHOT
+
+
+task create inviomailmainTask --definition "inviomailmain"
+task launch inviomailmainTask
+
+stesso loop su dataflow, interrotta a 14:25
+
+
+
+curl http://localhost:20100 -H "Content-type: text/plain" -d "Happy streaming"
+docker exec -it skipper tail -f /path/from/stdout/textbox/in/dashboard
+
+docker exec -it skipper tail -f /tmp/1674223667647/http-ingester.log-v1/stdout_0.log
+
+
+
+non funziona kafka neanche al semplice http logger fatto dalla guida..? ho restartato e funziona, mettendo le props come prima..
+
+
+stream create --definition "http --port=20100 | log" --name httpingest
+stream deploy --name httpingest
+stream destroy --name ticktock
+
+vedo il sorgente dei spring sample dataflow
+
+started bean '_org.springframework.integration.errorLogger'
+2023-01-20 14:19:08.217  INFO 356 --- [           main] o.s.c.s.b.k.p.KafkaTopicProvisioner      : Using kafka topic for outbound: task-events
+2023-01-20 14:19:08.254  INFO 356 --- [           main] o.a.k.clients.admin.AdminClientConfig    : AdminClientConfig values: 
+bootstrap.servers = [localhost:9092]
+ 
+interessante: configuration-properties.classes=io.spring.scenariotask.configuration.ScenarioProperties 
+in spring-cloud-dataflow-samples
+
+SORGENTE DI HTTP spring cloud stream:
+https://github.com/spring-cloud/stream-applications/releases
+
+
+https://repo.maven.apache.org/maven2/org/springframework/cloud/stream/app/stream-applications-descriptor/2021.1.2/stream-applications-descriptor-2021.1.2.kafka-apps-maven-repo-url.properties
+
+curl https://repo.maven.apache.org/maven2/org/springframework/cloud/stream/app/http-source-kafka/3.2.1/http-source-kafka-3.2.1.jar  -o http-source-kafka
+
+ho visto il codice ma non mi aiuta (sta nel supplier non in applications) perche' o usa spring integration
+import org.springframework.integration.dsl.IntegrationFlow;
+oppure 
+public Publisher<Message<byte[]>> httpSupplierFlow(HttpSupplierProperties httpSupplierProperties,
+return IntegrationFlows.from(
+WebFlux.inboundChannelAdapter(httpSupplierProperties.getPathPattern())
+ 
+interessante per spring integration + spring batch
+https://github.com/pakmans/spring-batch-integration-example/blob/master/src/main/java/net/oldgeek/IntegrationConfig.java
+
+
+app register --name inviomailmain --type task  --uri maven://it.dmi.fascicolopersonale:inviomailmain:1.0-SNAPSHOT
+task create inviomailmainTask --definition "inviomailmain"
+task launch inviomailmainTask
+
+
+https://stackoverflow.com/questions/51630260/connect-to-kafka-running-in-docker
