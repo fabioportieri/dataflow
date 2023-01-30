@@ -24,22 +24,28 @@ services:
   kafka-broker:
     image: confluentinc/cp-kafka:5.5.2
     container_name: dataflow-kafka
-    expose:
-      - "9092"
-    #ports:
-#  - "9092:9092"
+    # expose:
+#  - "9092"
+    ports:
+      - "19092:19092"
     environment:
       - LANG=en_US.utf8
       - LC_ALL=en_US.utf8
       - JDK_JAVA_OPTIONS=-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-broker:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-broker:9092,PLAINTEXT_HOST://localhost:19092
       - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
-      - KAFKA_ADVERTISED_HOST_NAME=kafka-broker
+      #      - KAFKA_ADVERTISED_HOST_NAME=kafka-broker
+      - KAFKA_ADVERTISED_HOST_NAME=127.0.0.1
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:19092
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_LOG4J_ROOT_LOGLEVEL=ERROR
       - KAFKA_LOG4J_LOGGERS=org.apache.zookeeper=ERROR,org.apache.kafka=ERROR,kafka=ERROR,kafka.cluster=ERROR,kafka.controller=ERROR,kafka.coordinator=ERROR,kafka.log=ERROR,kafka.server=ERROR,kafka.zookeeper=ERROR,state.change.logger=ERROR
     depends_on:
       - zookeeper
+    networks:
+      - application
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.2
@@ -48,6 +54,8 @@ services:
       - "2181"
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
+    networks:
+      - application
 
   dataflow-server:
     environment:
@@ -61,3 +69,5 @@ services:
       - SPRING_CLOUD_DATAFLOW_APPLICATIONPROPERTIES_STREAM_SPRING_KAFKA_STREAMS_PROPERTIES_METRICS_RECORDING_LEVEL=DEBUG
     depends_on:
       - kafka-broker
+    networks:
+      - application

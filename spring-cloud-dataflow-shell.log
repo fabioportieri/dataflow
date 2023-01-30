@@ -1,0 +1,8 @@
+1674220911128:app register --name inviomailmain --type task  --uri maven://it.dmi.fascicolopersonale:inviomailmain:1.0-SNAPSHOT
+1674224263127:task create inviomailmainTask
+1674224293438:task create inviomailmainTask --definition "inviomailmain"
+1674224298599:task launch inviomailmainTask
+1674231099842:task create inviomailmainTask --definition "inviomailmain"
+1674231134782:app register --name inviomailmain --type task  --uri maven://it.dmi.fascicolopersonale:inviomailmain:1.0-SNAPSHOT
+1674231137697:task create inviomailmainTask --definition "inviomailmain"
+1674231141118:task launch inviomailmainTask

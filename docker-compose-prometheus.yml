@@ -12,6 +12,8 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_PORT=7001
       #- SPRING_APPLICATION_JSON={"spring.jpa.properties.hibernate.generate_statistics":true}
       - SPRING_CLOUD_DATAFLOW_METRICS_DASHBOARD_URL=http://localhost:3000
+    networks:
+      - application
 
   skipper-server:
     environment:
@@ -20,6 +22,8 @@ services:
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_HOST=prometheus-rsocket-proxy
       - MANAGEMENT_METRICS_EXPORT_PROMETHEUS_RSOCKET_PORT=7001
       #- SPRING_APPLICATION_JSON={"spring.jpa.properties.hibernate.generate_statistics":true}
+    networks:
+      - application
 
   prometheus-rsocket-proxy:
     image: micrometermetrics/prometheus-rsocket-proxy:1.0.0
@@ -36,6 +40,8 @@ services:
       - server.port=9096
       - micrometer.prometheus-proxy.websocket-port=8086
       - micrometer.prometheus-proxy.tcp-port=7001
+    networks:
+      - application
 
   grafana:
     #environment:
@@ -44,9 +50,13 @@ services:
     container_name: grafana
     ports:
       - '3000:3000'
+    networks:
+      - application
 
   prometheus:
     image: springcloud/spring-cloud-dataflow-prometheus-local:${DATAFLOW_VERSION:-2.10.1-SNAPSHOT}
     container_name: prometheus
     ports:
       - '9090:9090'
+    networks:
+      - application

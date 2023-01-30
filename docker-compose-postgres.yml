@@ -20,6 +20,9 @@ services:
       - 5432
     ports:
       - 5432:5432
+    networks:
+      - application
+
 
   dataflow-server:
     environment:
@@ -29,6 +32,8 @@ services:
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
     depends_on:
       - postgres
+    networks:
+      - application
   skipper-server:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/dataflow
@@ -37,3 +42,5 @@ services:
       - SPRING_DATASOURCE_DRIVER_CLASS_NAME=org.postgresql.Driver
     depends_on:
       - postgres
+    networks:
+      - application
