@@ -25,7 +25,7 @@ services:
     image: confluentinc/cp-kafka:5.5.2
     container_name: dataflow-kafka
     #expose:
-#  - "9092"
+    #  - "9092"
     hostname: kafka-broker
     ports:
       - "19092:19092"
@@ -42,6 +42,8 @@ services:
       - KAFKA_LOG4J_LOGGERS=org.apache.zookeeper=ERROR,org.apache.kafka=ERROR,kafka=ERROR,kafka.cluster=ERROR,kafka.controller=ERROR,kafka.coordinator=ERROR,kafka.log=ERROR,kafka.server=ERROR,kafka.zookeeper=ERROR,state.change.logger=ERROR
     depends_on:
       - zookeeper
+    networks:
+      - application
 
   zookeeper:
     image: confluentinc/cp-zookeeper:5.5.2
@@ -51,6 +53,8 @@ services:
       - "2181"
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
+    networks:
+      - application  
 
   dataflow-server:
     environment:
@@ -64,3 +68,5 @@ services:
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR= 2
     depends_on:
       - kafka-broker
+    networks:
+      - application
